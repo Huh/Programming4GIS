@@ -3,6 +3,10 @@ Materials and resources related to Geography 491/489 at The University of Montan
 
 This repository only reflects those topics covered in the 4 lectures concerning R.
 
+## Why GitHub?
+
+Because it is great!  If you have questions, feature requests or find bugs in the code here you can let me know about it using the Issues tab above, fix it yourself and submit a pull request and of course you can clone all of the code here to use in your own projects.  Git is a great tool for version control and GitHub among others have made it easier to use and added lots of value.
+
 ## Cheat Sheets
 
 https://www.rstudio.com/resources/cheatsheets/
