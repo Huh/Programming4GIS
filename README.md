@@ -5,7 +5,9 @@ This repository only reflects those topics covered in the 4 lectures concerning 
 
 ## Why GitHub?
 
-Because it is great!  If you have questions, feature requests or find bugs in the code here you can let me know about it using the Issues tab above, fix it yourself and submit a pull request and of course you can clone all of the code here to use in your own projects.  Git is a great tool for version control and GitHub among others have made it easier to use and added lots of value.
+Because it is great!  If you have questions, feature requests or find bugs in the code here you can let me know about it using the Issues tab above.  You could even fix it yourself and submit a pull request to help keep the code up to date and running smoothly.  Of course you can clone all of the code here to use in your own projects and this type of thing is highly encouraged.  
+
+Git is a great tool for version control and GitHub among others have made it easier to use and added lots of value.  Check out the add-ins, Projects, Wiki and more.  
 
 ## Cheat Sheets
 
