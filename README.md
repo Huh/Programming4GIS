@@ -7,7 +7,7 @@ This repository only reflects those topics covered in the 4 lectures concerning 
 
 https://www.rstudio.com/resources/cheatsheets/
 
-## TidyVerse
+## TidyVerse - a way of life
 
 https://www.tidyverse.org/
 
@@ -17,7 +17,7 @@ https://github.com/r-spatial/sf
 *See Vignettes at:*
 https://cran.r-project.org/web/packages/sf
 
-The usual suspects...the most useful packages for getting going with GIS in R
+The usual suspects...a few of the more useful packages for getting going with GIS in R
 
 - [sp](https://cran.r-project.org/web/packages/sp/index.html)
 - [raster](https://cran.r-project.org/web/packages/raster/index.html)
@@ -30,10 +30,15 @@ The usual suspects...the most useful packages for getting going with GIS in R
     - [GEOS](https://trac.osgeo.org/geos)
 - [maptools](https://cran.r-project.org/web/packages/maptools/index.html)
 - [tmaps](https://cran.r-project.org/web/packages/tmap/index.html)
+- [leaflet](https://rstudio.github.io/leaflet/)
 
 **Anytime we want to learn about a topic in R we can use the task views located at https://cran.r-project.org/web/views/**
 
 [Check out the spatial task view!](https://cran.r-project.org/web/views/Spatial.html)
+
+## R can be used with external programs/languages
+- Call Python from R with https://github.com/rstudio/reticulate for example
+- Or try using R with other open source tools like GRASS or ...https://geostat-course.org/content/get-training-r-osgeo
 
 ## More to come...
 
