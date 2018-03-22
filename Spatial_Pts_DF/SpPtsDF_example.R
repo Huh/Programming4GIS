@@ -6,6 +6,7 @@
 		require(sp)
 		require(rgdal)
 		require(dplyr)
+    
 ################################################################################
 		#  Simulate some data
 		xy_dat <- data.frame(ID = 1:10,
