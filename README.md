@@ -17,6 +17,7 @@ https://github.com/r-spatial/sf
 *See Vignettes at:*
 https://cran.r-project.org/web/packages/sf
 
+## Need to know packages
 The usual suspects...a few of the more useful packages for getting going with GIS in R
 
 - [sp](https://cran.r-project.org/web/packages/sp/index.html)
