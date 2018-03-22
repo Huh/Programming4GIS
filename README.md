@@ -33,6 +33,15 @@ The usual suspects...a few of the more useful packages for getting going with GI
 - [tmaps](https://cran.r-project.org/web/packages/tmap/index.html)
 - [leaflet](https://rstudio.github.io/leaflet/)
 
+If you want to load most of these files try:
+```R
+#  If needed install devtools
+#install.packages(devtools)
+
+devtools::source_url("https://raw.githubusercontent.com/Huh/Programming4GIS/master/Starter_Kit/pkg_install.R")
+
+```
+
 **Anytime we want to learn about a topic in R we can use the task views located at https://cran.r-project.org/web/views/**
 
 [Check out the spatial task view!](https://cran.r-project.org/web/views/Spatial.html)
