@@ -7,6 +7,7 @@ output: html_document
 <!-- This is a comment in markdown -->
 <!-- Below we insert a horizontal line using three asteriks -->
 ***
+
 <!-- Below we use html headers by specifying the hash tags -->
 ### This is a markdown document
 
