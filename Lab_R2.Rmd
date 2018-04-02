@@ -1,0 +1,182 @@
+---
+title: "Spatial Programming R2"
+author: "Josh Nowak"
+date: "April 2, 2018"
+output: html_document
+---
+
+```{r}
+require(sp)
+require(raster)
+require(tidyr)
+require(dplyr)
+```
+
+### Recipe part 2 - Programming and design patterns
+
+In general we want to distill problems to their simplest form.  This may not results in a simple solution, but it will be the simplest.
+
+Imagine we want to build xy points for a number of individuals and then calculate a home range, i.e. kernel density, on those points.  Let's say we have 20 animals that we want to perform this procedure on.  How do we proceed?
+
+Simplify the problem to one individual...
+```{r}
+build_xy <- function(npts, center_x, noise_x, center_y, noise_y){
+  
+  xs <- rnorm(npts, center_x, noise_x)
+  ys <- rnorm(npts, center_y, noise_y)
+  
+  out <- tibble::tibble(
+    x = xs,
+    y = ys
+  )
+  
+return(out)
+}
+```
+
+Nice and clean, no extra steps and useful in other projects, likely.
+
+Ok, so we can make it spatial, but spatial things are a little harder to work with.  How about we hold off on being spatial as long as possible.  Let's create some data...
+
+```{r}
+
+ind_dat <- tibble::tibble(
+  ID = 1:20,
+  Npts = round(runif(20, 3, 22))
+  )
+
+ind_dat
+```
+
+Each individual now has an ID and some number of points associated with it.  Now we want to apply our function to create xy data to each individual.
+
+```{r}
+ind_dat <- tibble::tibble(
+  ID = 1:20,
+  Npts = round(runif(20, 3, 22))
+  ) %>%
+  group_by(ID) %>%
+  do(xy = build_xy(.$Npts, center_x = -115, noise_x = 100, center_y = 45, noise_y = 50))
+
+ind_dat
+```
+
+That was cool, but now we have theis weird listcol *xy* and we would prefer to just have long data.  Try tidyr::unnest...
+
+```{r}
+ind_dat <- tibble::tibble(
+  ID = 1:20,
+  Npts = round(runif(length(ID), 3, 22))
+  ) %>%
+  group_by(ID) %>%
+  do(xy = build_xy(.$Npts, center_x = -115, noise_x = 100, center_y = 45, noise_y = 50)) %>%
+  unnest
+
+ind_dat
+```
+
+Very cool, now we have long data and we have created data in a very simple and flexible fashion.  How might we also build this to have a different home range center for each individual?
+
+```{r}
+ind_dat <- tibble::tibble(
+  ID = 1:20,
+  Npts = round(runif(length(ID), 3, 22)),
+  x_center = runif(length(ID), -120, -110),
+  y_center = runif(length(ID), 40, 48),
+  ) %>%
+  group_by(ID, x_center, y_center) %>%
+  do(xy = 
+    build_xy(
+      .$Npts, 
+      center_x = .$x_center, 
+      noise_x = 100, 
+      center_y = .$y_center, 
+      noise_y = 50
+    )
+  ) %>%
+  unnest
+
+ind_dat
+```
+
+Check that each individual has a unique home range center
+```{r}
+ind_dat %>%
+  group_by(ID) %>%
+  distinct(x_center, y_center, .keep_all = F)
+```
+
+Nice!  Ok, now we want to calculate the home range center for each individual.  Let's simplify the problem to a single individual.
+
+```{r}
+    hr_kud <- function(x, ...){
+      #  A function to calculate kernel utilization distributions of single 
+      #   animals or groups of animals
+      #  Takes a spatial points data frame and if desired additional arguments 
+      #   to pass to adehabitatHR::kernelUD
+      #  Returns estUD object
+      #  Intended to be called from within hr_wrapper
+      #  Example Call: 
+      #   hr_kud(xy, grid = 200, same4all = T)
+      #  For more information on options see adehabitatHR documentation
+      #  https://cran.r-project.org/web/packages/adehabitatHR/index.html
+
+      out <- try(adehabitatHR::kernelUD(x, ...))
+
+    return(out)
+    }
+```
+
+Looks like we need a new package adehabitatHR, install the package.  If we type `?adehabitatHR::kernelUD` we see that the first argument to kernelUD must be of class SpatialPoints, so we need a function to change our xy data to a spatial object.
+
+```{r}
+    hr_spdf <- function(x, id, prj){
+      #  A function to create a spatial points data frame from a data.frame
+      #  Takes a data frame containing coordinates of points defined by 
+      #   x|longitude and y|latitude, the column of the id of the group and 
+      #   a proj4string that defines the spatial projection
+      #  Returns a spatial points data frame object
+      #  See spatialreference.org for proj4string definitions
+      
+      out <- sp::SpatialPointsDataFrame(
+        select(x, 
+          grep("^x|^longitude", colnames(x), ignore.case = T),
+          grep("^y|^latitude", colnames(x), ignore.case = T)),
+        data = as.factor(id),
+        proj4string = CRS(prj)      
+      )
+
+    return(out)
+    }
+
+```
+
+The workflow then is something like
+- build xy
+- make xy spatial
+- calculate home range kernel
+
+Let's try it for one animal
+```{r}
+tst_dat <- tibble::tibble(
+  ID = 1,
+  Npts = round(runif(length(ID), 3, 22)),
+  x_center = runif(length(ID), -120, -110),
+  y_center = runif(length(ID), 40, 48),
+  ) %>%
+  group_by(ID, x_center, y_center) %>%
+  do(xy = 
+    build_xy(
+      .$Npts, 
+      center_x = .$x_center, 
+      noise_x = 100, 
+      center_y = .$y_center, 
+      noise_y = 50
+    )
+  ) %>%
+  unnest %>%
+  ungroup
+
+#tst_sp <- hr_spdf(tst_dat, id = dplyr::select(tst_dat, ID), prj = '+proj=longlat +datum=WGS84')
+#tst_kud <- hr_kud(tst_sp, grid = 200, same4all = T)
+```

@@ -1,0 +1,148 @@
+---
+title: "Lab R1"
+author: "Josh Nowak"
+date: "April 2, 2018"
+output: html_document
+---
+
+##  Recipe portion of the lab...Spatial basics
+
+Code in this section was taken from [rspatial](http://www.rspatial.org/spatial/rst/3-vectordata.html)
+
+### Prerequisites
+```{r, message = F, warning = FALSE}
+
+require(sp)
+require(raster)
+require(tidyr)
+require(dplyr)
+
+```
+
+###  Spatial Points
+```{r}
+  longitude <- c(-116.7, -120.4, -116.7, -113.5, -115.5, -120.8, -119.5, -113.7, -113.7, -110.7)
+  latitude <- c(45.3, 42.6, 38.9, 42.1, 35.7, 38.9, 36.2, 39, 41.6, 36.9)
+  lonlat <- cbind(longitude, latitude)
+```
+
+1) What is the class of lonlat?
+
+2) What is the structure?  Is it projected?
+
+
+```{r}
+xy_sp <- SpatialPoints(lonlat)
+
+```
+
+3) What is the class of xy_sp?...what just happened?
+
+4) What is the type of xy_sp? (Hint: S3 or S4)  Why do we care?
+
+5) What is the projection of xy_sp?
+
+6) What slots were added to the object that we did not previously create?
+
+```{r}
+crdref <- CRS('+proj=longlat +datum=WGS84')
+xy_sp <- SpatialPoints(lonlat, proj4string = crdref)
+```
+
+Adding data is easy...
+
+```{r}
+df <- tibble::tibble(
+  ID = 1:nrow(lonlat),
+  elev = runif(nrow(lonlat), 1000, 8000)
+)
+
+pts_df <- SpatialPointsDataFrame(
+  xy_sp,
+  data = df
+)
+```
+
+7) What is the difference between pts and pts_df?  What new slot was created?
+
+Subsetting is also easy...
+
+```{r}
+pts_df[pts_df$elev > 3000,]
+# subset(pts_df, elev > 3000)
+```
+
+Conversion back to a dataframe is not so hard...
+```{r}
+as.data.frame(pts_df)
+```
+
+
+### Spatial Lines and Polygons
+
+```{r}
+lon <- c(-116.8, -114.2, -112.9, -111.9, -114.2, -115.4, -117.7)
+lat <- c(41.3, 42.9, 42.4, 39.8, 37.6, 38.3, 37.6)
+lonlat <- cbind(lon, lat)
+```
+
+Create a SpatialLines
+```{r}
+lns <- spLines(lonlat, crs=crdref)
+lns
+```
+
+Create SpatialPolygons
+```{r}
+pols <- spPolygons(lonlat, crs=crdref)
+pols
+```
+
+Plotting these objects is easy with base R, but other options may make prettier 
+maps.
+
+```{r}
+par(bty = "l")
+plot(pols, axes = TRUE, las = 1)
+plot(pols, border = "navy", col = "gray80", lwd = 3, add = TRUE)
+points(
+  pts_df, 
+  col = "dodgerblue", 
+  pch = 19, 
+  cex = pts_df$elev/max(pts_df$elev) * 1.3
+)
+```
+
+
+***
+
+### Your turn - Include your code in your response
+
+1) Create some point data (i.e. xy) that falls within MT.  Store the data in a tibble.
+
+2) Add a column called elevation and randomly assign values between 1000 and 5000.
+
+3) The object you created is of class tibble.  Convert this object to SpatialPointsDataFrame
+
+4) Why SpatialPointsDataFrame and not SpatialPoints?
+
+5) Define the projection of your data, WGS84
+
+6) Plot your spatial data, add
+  - Title
+  - label the X and Y axes
+  - Change the point types to be filled dots
+  - Make the dots "dodgerblue"
+  - Make the size of the dot reflect the value in the elevation column
+
+7) Subset your data to those points where elevation is greater than 2000
+
+8) Plot the subset data as before
+
+9) Now convert your point data to a raster...rasterize it
+  - Hint: ?raster::rasterize
+
+10) Plot the raster you made and overlay the points from before
+
+***
+
