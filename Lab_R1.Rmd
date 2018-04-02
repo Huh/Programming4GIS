@@ -2,7 +2,7 @@
 title: "Lab R1"
 author: "Josh Nowak"
 date: "April 2, 2018"
-output: github_document
+output: html_document
 ---
 
 ##  Recipe portion of the lab...Spatial basics
@@ -145,4 +145,6 @@ points(
 10) Plot the raster you made and overlay the points from before
 
 ***
+
+When completed, please print the rendered markdown document and submit it for grading.
 

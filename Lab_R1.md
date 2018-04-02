@@ -69,13 +69,13 @@ pts_df[pts_df$elev > 3000,]
 ```
 
     ## class       : SpatialPointsDataFrame 
-    ## features    : 7 
-    ## extent      : -120.4, -110.7, 35.7, 45.3  (xmin, xmax, ymin, ymax)
+    ## features    : 9 
+    ## extent      : -120.8, -110.7, 35.7, 42.6  (xmin, xmax, ymin, ymax)
     ## coord. ref. : +proj=longlat +datum=WGS84 +ellps=WGS84 +towgs84=0,0,0 
     ## variables   : 2
     ## names       : ID,             elev 
-    ## min values  :  1, 3200.78092324547 
-    ## max values  : 10, 7318.09732760303
+    ## min values  :  2, 3170.90619681403 
+    ## max values  : 10, 7157.11485594511
 
 ``` r
 # subset(pts_df, elev > 3000)
@@ -88,16 +88,16 @@ as.data.frame(pts_df)
 ```
 
     ##    ID     elev longitude latitude
-    ## 1   1 3573.427    -116.7     45.3
-    ## 2   2 3358.276    -120.4     42.6
-    ## 3   3 4465.390    -116.7     38.9
-    ## 4   4 4499.683    -113.5     42.1
-    ## 5   5 3200.781    -115.5     35.7
-    ## 6   6 1575.131    -120.8     38.9
-    ## 7   7 1549.709    -119.5     36.2
-    ## 8   8 2603.420    -113.7     39.0
-    ## 9   9 7318.097    -113.7     41.6
-    ## 10 10 4414.052    -110.7     36.9
+    ## 1   1 2199.714    -116.7     45.3
+    ## 2   2 3347.142    -120.4     42.6
+    ## 3   3 3490.569    -116.7     38.9
+    ## 4   4 6980.759    -113.5     42.1
+    ## 5   5 7157.115    -115.5     35.7
+    ## 6   6 6123.401    -120.8     38.9
+    ## 7   7 6398.515    -119.5     36.2
+    ## 8   8 3170.906    -113.7     39.0
+    ## 9   9 6754.323    -113.7     41.6
+    ## 10 10 6108.714    -110.7     36.9
 
 ### Spatial Lines and Polygons
 
@@ -180,3 +180,5 @@ points(
 1.  Plot the raster you made and overlay the points from before
 
 ------------------------------------------------------------------------
+
+When completed, please print the rendered markdown document and submit it for grading.
