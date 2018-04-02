@@ -17,6 +17,12 @@ require(tidyr)
 require(dplyr)
 ```
 
+Please create a markdown document to submit your work. To create the document in RStudio
+
+File -&gt; New File -&gt; R Markdown
+
+There will be example text in the new document that opens. This text can be deleted. The cheat sheets linked in the GitHub repository include rmarkdown and may make it easier to work with this tool.
+
 ### Spatial Points
 
 ``` r
@@ -69,13 +75,13 @@ pts_df[pts_df$elev > 3000,]
 ```
 
     ## class       : SpatialPointsDataFrame 
-    ## features    : 9 
-    ## extent      : -120.8, -110.7, 35.7, 42.6  (xmin, xmax, ymin, ymax)
+    ## features    : 6 
+    ## extent      : -120.8, -110.7, 35.7, 45.3  (xmin, xmax, ymin, ymax)
     ## coord. ref. : +proj=longlat +datum=WGS84 +ellps=WGS84 +towgs84=0,0,0 
     ## variables   : 2
     ## names       : ID,             elev 
-    ## min values  :  2, 3170.90619681403 
-    ## max values  : 10, 7157.11485594511
+    ## min values  :  1, 3213.21571036242 
+    ## max values  : 10, 7953.53801245801
 
 ``` r
 # subset(pts_df, elev > 3000)
@@ -88,16 +94,16 @@ as.data.frame(pts_df)
 ```
 
     ##    ID     elev longitude latitude
-    ## 1   1 2199.714    -116.7     45.3
-    ## 2   2 3347.142    -120.4     42.6
-    ## 3   3 3490.569    -116.7     38.9
-    ## 4   4 6980.759    -113.5     42.1
-    ## 5   5 7157.115    -115.5     35.7
-    ## 6   6 6123.401    -120.8     38.9
-    ## 7   7 6398.515    -119.5     36.2
-    ## 8   8 3170.906    -113.7     39.0
-    ## 9   9 6754.323    -113.7     41.6
-    ## 10 10 6108.714    -110.7     36.9
+    ## 1   1 4369.533    -116.7     45.3
+    ## 2   2 3436.909    -120.4     42.6
+    ## 3   3 2316.814    -116.7     38.9
+    ## 4   4 2537.322    -113.5     42.1
+    ## 5   5 7953.538    -115.5     35.7
+    ## 6   6 6501.040    -120.8     38.9
+    ## 7   7 3946.655    -119.5     36.2
+    ## 8   8 1478.204    -113.7     39.0
+    ## 9   9 2065.274    -113.7     41.6
+    ## 10 10 3213.216    -110.7     36.9
 
 ### Spatial Lines and Polygons
 

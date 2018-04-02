@@ -2,7 +2,7 @@
 title: "Lab R1"
 author: "Josh Nowak"
 date: "April 2, 2018"
-output: html_document
+output: github_document
 ---
 
 ##  Recipe portion of the lab...Spatial basics
@@ -18,6 +18,12 @@ require(tidyr)
 require(dplyr)
 
 ```
+
+Please create a markdown document to submit your work.  To create the document in RStudio
+
+File -> New File -> R Markdown
+
+There will be example text in the new document that opens.  This text can be deleted.  The cheat sheets linked in the GitHub repository include rmarkdown and may make it easier to work with this tool.
 
 ###  Spatial Points
 ```{r}
