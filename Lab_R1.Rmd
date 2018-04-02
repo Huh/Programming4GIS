@@ -2,7 +2,7 @@
 title: "Lab R1"
 author: "Josh Nowak"
 date: "April 2, 2018"
-output: html_document
+output: github_document
 ---
 
 ##  Recipe portion of the lab...Spatial basics
