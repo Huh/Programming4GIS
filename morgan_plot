@@ -1,0 +1,52 @@
+require(ggplot2)
+require(circular)
+require(dplyr)
+
+look <- tibble::tibble(
+  dgrs = c(22.5, 67.5, 112.5, 157.5, 202.5, 247.5, 292.5, 337.5, 360),
+  lab = c("N", "NE", "E", "SE", "S", "SW", "W", "NW", "N")
+)
+
+dat <- tibble::tibble(
+    aspect = runif(50, 0, 360),
+    area = rnorm(50, 999, 100)
+  )
+
+dat$asp <- NA
+
+dat$asp[dat$aspect < look$dgrs[1]] <- 1
+for(i in 1:7){
+  dat$asp[dat$aspect > look$dgrs[i] & dat$aspect < look$dgrs[i+1]] <- i
+}
+dat$asp[dat$aspect > look$dgrs[8]] <- 1
+
+
+dat2 <- dat %>% 
+  mutate(
+    Aspect = look$lab[asp]
+  ) %>%
+  group_by(Aspect) %>%
+  summarise(
+    Area = sum(area)
+  ) %>%
+  ungroup %>%
+  mutate(
+    Rank = order(Area)
+  )
+  
+
+ggplot(dat2, aes(x = Aspect, y = Area, fill = Aspect)) +
+  geom_bar(stat = "identity") +
+  coord_polar(start=pi^2.5) +
+  scale_fill_brewer(
+    palette="Blues", 
+    labels = paste(
+      prettyNum(round(dat2$Area), big.mark = ","),
+      "acres"
+    )
+  ) +
+  theme(
+    panel.background = element_blank(),
+    legend.title=element_blank()
+  ) +
+  ggtitle("Best Ever")
