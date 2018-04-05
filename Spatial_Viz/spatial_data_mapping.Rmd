@@ -1,0 +1,254 @@
+---
+title: "Plotting Spatial Data in R"
+author: "Joe Smith"
+date: "4/5/2018"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Review: kinds of spatial data
+
+### 1) raster 
+
+Raster data are spatial data stored in a grid. Examples include Digital Elevation Models (DEM), spatially-interpolated climate or weather data (e.g., PRISM, DAYMET, WorldClim), or model predictions extrapolated across space (e.g., predictions of occupancy, abundance, density). The R package [raster](https://cran.r-project.org/web/packages/raster/index.html) is all that is needed for most raster data handling in R.
+
+### 2) vector 
+
+Vector data are data represented by points, lines, and polygons. Shapefiles, KMLs, and GeoJSONs are common formats used to represent geographic vector data. The R package [sp](https://cran.r-project.org/web/packages/sp/index.html) handles most vector data needs in R. Other helpful functions can be found in the [rgeos](https://cran.r-project.org/web/packages/rgeos/rgeos.pdf) package, where tools similar to those found in the ArcGIS Analysis Toolbox (e.g., clip, union, buffer).
+
+## Plotting spatial data with Base R
+
+First, we'll load [tmap](https://cran.r-project.org/web/packages/tmap/index.html), which we'll use later to make some nice-looking maps. Here, we're just going to load it because it has some "example" spatial data we can plot.
+
+```{r}
+library(sp)
+library(tmap)
+data(World)
+data(metro)
+```
+
+Both datasets, "World" and "metro," are vector datasets. We'll use Base R to plot these so you can see what they look like:
+
+```{r}
+plot(World)
+plot(metro, pch=16, cex=0.5)
+```
+
+Neat, but I want them on the same map. Let's try this:
+
+```{r}
+plot(World)
+plot(metro, pch=16, cex=0.5, add=T)
+```
+
+I used the argument 'pch=16' to specify the symbol that I wanted to use for metro areas, a filled circle. More plotting characters can be found by [googling it](https://www.google.com/search?q=R+plotting+characters). The argument 'cex=0.5' controls the symbol size.
+
+Our metropolitan areas didn't show up. Why not? Usually it's because the coordinate reference systems (CRS) of the datasets don't match.
+
+```{r}
+proj4string(World)
+proj4string(metro)
+```
+
+Herein lies a fundamental difference between making maps in R (especially base R) and making maps in ArcGIS. R doesn't 'project on the fly,' so you're responsible for lining everything up by getting all your datasets projected into a common CRS. The mapping functions in the tmap package have some project-on-the-fly functionality, but it's best to get your layers in a common CRS anyway because *most* of the functions you will use to process spatial data demand it.
+
+### Reprojecting vector data
+
+For this example, it doesn't matter what CRS we use, just as long as all of our datasets share the same one. We'll use the CRS from metro. To reproject vector data, we use the function sp::spTransform. The first argument is the dataset we want to reproject ("transform"), the second argument is the CRS, which needs to be cast into the CRS class. We'll call  this reprojected dataset "world" (lower-case w).
+
+```{r tidy=T}
+world <- spTransform(World, CRS(proj4string(metro)))
+```
+
+Now try plotting again:
+
+```{r tidy=T}
+plot(world)
+plot(metro, pch=16, cex=0.5, add=T)
+```
+
+Base R is very flexible and you can make very sophisticated, visually attractive maps with it. It'll just take a lot of code to get it looking right.
+
+### Raster data
+
+Base R can also plot raster data. Let's take a look at a common type of raster data that's freely available: climate data. [WorldClim](http://worldclim.org/version2) has some basic data like average monthly precipitation and temperature, as well as a suite of "bioclimatic variables" that can be useful for predicting species distributions, etc. We'll download the bioclimatic variables and look at a few of them.
+
+```{r tidy=T}
+library(raster)
+paths <- list.files("~/Downloads/wc2.0_10m_bio", ".tif", full.names=T)
+raster.list <- lapply(paths, function(x) raster(x))
+bio <- do.call(brick, raster.list)
+class(bio)
+```
+
+We now have a "RasterBrick" containing all the bioclimatic variables as layers or bands.
+
+```{r}
+nlayers(bio)
+names(bio)
+```
+
+Maybe you're interested in precipitation. According to the WorldClim website:
+
+- BI012 = Annual Precipitation
+- BIO13 = Precipitation of Wettest Month
+- BIO14 = Precipitation of Driest Month
+- BIO15 = Precipitation Seasonality (Coefficient of Variation).
+
+These correspond to layers 12 through 15, so let's subset our RasterBrick to just those layers and take a look at them.
+
+```{r}
+precip <- bio[[12:15]]
+class(precip)
+plot(precip)
+```
+
+The colors are alright, but they can be easily changed. The function colorRampPalette is a convenient and flexible way to make interpolated color ramps for continuous data like these.
+
+```{r, tidy=T}
+precip.colors <- colorRampPalette(c("#fc8d59","#ffffbf","#4575b4"),bias=4)
+plot(precip, col=precip.colors(100))
+```
+
+### Reprojecting raster data in R
+
+Reprojecting raster data requires a different function than that used on vector data. Unsurprisingly, it's found in the raster package, raster::projectRaster. The same function is used whether you're dealing with a single layer/band (a RasterLayer) or a multi-layer RasterStack or RasterBrick.
+
+```{r tidy=T, message=F}
+precip <- projectRaster(precip, crs=CRS(proj4string(world)))
+```
+
+Now let's add the country boundaries and metro areas,
+
+```{r tidy=T, message=F, warning=F}
+plot(precip[[1]], col=precip.colors(100))
+lines(world, lwd=0.25, col="grey50")
+points(metro, cex=0.8*(metro$pop2010/max(metro$pop2010)))
+```
+
+## Getting serious: making better maps with tmap
+
+[tmap](https://cran.r-project.org/web/packages/tmap/index.html) works much like ggplot.
+
+```{r message=F, warning=F}
+tm_shape(precip) +
+  tm_raster(col="wc2.0_bio_10m_12", title="Annual precipitation", palette=precip.colors(100), n=100, legend.show = F) +
+tm_shape(world) +
+  tm_borders("grey35", lwd=0.5) +
+tm_shape(metro) +
+  tm_symbols(size="pop2010", title.size="Metro population", col="black", shape=1, scale=0.5)
+```
+
+Now if we want to plot the same basic map but display multiple attributes in different panels, just pass a vector of raster layer names to the "col" argument in tm_raster().
+
+Recall that these can be accessed with names():
+
+```{r}
+names(precip)
+```
+
+```{r message=F, warning=F}
+tm_shape(precip) +
+  tm_raster(col=names(precip), palette=precip.colors(100), n=100, legend.show = F) +
+tm_shape(world) +
+  tm_borders("grey35", lwd=0.5) +
+tm_shape(metro) +
+  tm_symbols(size="pop2010", title.size="Metro population", col="black", shape=1, scale=0.5)
+```
+
+To change aspects of the general appearance of the map, use the function tm_layout
+
+```{r message=F, warning=F}
+tm_shape(precip) +
+  tm_raster(col=names(precip), palette=precip.colors(100), n=100, legend.show = F) +
+  tm_facets(free.scales=T) +
+tm_shape(world) +
+  tm_borders("grey35", lwd=0.5) +
+tm_shape(metro) +
+  tm_symbols(size="pop2010", title.size="Metro population", col="black", shape=1, scale=0.5) +
+tm_layout(bg.color="grey80",
+          legend.bg.color="white",
+          legend.outside=T,
+          legend.outside.position="right",
+          panel.labels=c("Annual Precipitation",
+                         "Precipitation of Wettest Month",
+                         "Precipitation of Driest Month",
+                         "Precipitation Seasonality (CV)"),
+          panel.label.bg.color="white")
+```
+
+Say we want to change the frame of our map to only show Africa. This can easily be done by specifying the bbox (bounding box) using tmaptools::bb(). First, let's have a look at the world dataset to see how we can subset this SpatialPolygonsDataFrame to Africa.
+
+```{r}
+head(world)
+```
+
+Conveniently, there's a column called "continent" to which we can apply a logical statement to subset the data, like so:
+
+```{r message=F, warning=F}
+tm_shape(precip, bbox=tmaptools::bb(world[world$continent == "Africa",], ext=1.1)) +
+  tm_raster(col=names(precip), palette=precip.colors(100), n=100, legend.show = F) +
+  tm_facets(free.scales=T) +
+tm_shape(world) +
+  tm_borders("grey35", lwd=0.5) +
+tm_shape(metro) +
+  tm_symbols(size="pop2010", title.size="Metro population", col="black", shape=1, scale=0.75) +
+tm_layout(bg.color="grey80",
+          legend.bg.color="white",
+          legend.outside=T,
+          legend.outside.position="right",
+          panel.labels=c("Annual Precipitation",
+                         "Precipitation of Wettest Month",
+                         "Precipitation of Driest Month",
+                         "Precipitation Seasonality (CV)"),
+          panel.label.bg.color="white")
+```
+
+## Getting interactive: tmap view mode
+
+Note: the following is modified only slightly from the vignette "tmap-modes" (see vignette("tmap-modes", package="tmap"))
+
+Static maps are fine, but the world is going interactive (for example, see this [this](https://www.gapminder.org/tools/) or [this](https://archive.nytimes.com/www.nytimes.com/interactive/2009/03/10/us/20090310-immigration-explorer.html?_r=1)).
+
+There are a growing number of tools that facilitate the production of interactive figures, including maps, in R. The tmap package uses Leaflet to implement interactive maps; this feature is accessed by switching into "view mode."
+
+First we'll make a static map, but this time we'll assign it to an object instead of simply printing it.
+
+```{r}
+metro$growth <- (metro$pop2020 - metro$pop2010) / (metro$pop2010 * 10) * 100
+
+mapWorld <- tm_shape(world) +
+    tm_polygons("income_grp", palette="-Blues", contrast=.7, id="name", title="Income group") +
+    tm_shape(metro) +
+    tm_bubbles("pop2010", col = "growth", 
+               border.col = "black", border.alpha = .5, 
+               style="fixed", breaks=c(-Inf, seq(0, 6, by=2), Inf),
+               palette="-RdYlBu", contrast=1, 
+               title.size="Metro population", 
+               title.col="Growth rate (%)", id="name") + 
+    tm_style_gray() +
+    tm_format_World()
+```
+
+To plot, just print the declared variable mapWorld:
+
+```{r}
+mapWorld
+```
+
+The current mode can be obtained and set with the function tmap_mode:
+
+```{r}
+tmap_mode("view")
+```
+
+Now the mode is set to view, we can interactively view it by printing it again:
+
+```{r}
+mapWorld
+```
+
+In interactive mode, a leaflet widget is created and shown. If you want to change or extend the widget, you can use the function tmap_leaflet to obtain the leaflet widget object, and use leaflet’s own functions to adjust it.
