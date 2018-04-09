@@ -1,0 +1,188 @@
+---
+title: "Packages - Code Storage"
+author: "Josh Nowak"
+output: 
+  github_document:
+    toc: true
+    toc_depth: 3
+---
+
+## Packages
+
+Packages are the basic unit of code storage in R.  They are easy to write and suggest a logical workflow.  In addition, they ease the sharing of code and present code in a consistent manner.
+
+*The code and some of the explanation below assumes you are using RStudio.*
+
+### Prerequisites
+
+Load the required packages, if you do not have one or more of these packages install the package using `install.packages("package_name)`:
+
+```{r, eval = T, echo = T, message = F, warning = F}
+  require(covr)
+  require(testthat)
+  require(covr)
+  require(roxygen2)
+  require(usethis)
+```
+
+Per usual I am going to give a quick plug for version control.  I am a believer and think it is an important part of writing good code, sharing code and making our workflows transparent.  I use [git](https://git-scm.com/) and am a big fan, but the learning curve is steep.  RStudio and GitHubWhatever you do, just get going with git and you will soon realize the many benefits and start delving deeper.  There are some GUIs that help with git including [Sourcetree](https://www.sourcetreeapp.com/) and [GitKraken](https://www.gitkraken.com/) among others.  Once you have committed to learning git you should also consider [GitHub](https://github.com/) or [GitLab](https://about.gitlab.com/) for online code storage.  The online repositories have really taken off and are one of the best ways to find code and explore what people are working on.  The plugins are amazing too and help us write better code.  A few favoriates are [Travis](https://github.com/marketplace/travis-ci) and [ZenHub](https://github.com/marketplace/zenhub), but you can find your own favorites by browsing the [marketplace](https://github.com/marketplace) on GitHub. 
+
+One of the best resources I have ever used for learning git and GitHub is [happygitwithr](http://happygitwithr.com/).  In addition, I am a huge fan of [Jenny Bryan aka jennybc](https://github.com/jennybc).  You will benefit from her amazing teaching style and sense of humor.
+
+You may also notice that the packages used here play nice with each other, that is no accident.  The [tidyverse](https://www.tidyverse.org/) and associated tools are built by a team of folks with a common goal and philosophy.
+
+Enough...let's get going.
+
+## Create a package
+
+Throughout this workflow we will rely heavily on the [usethis package](https://github.com/r-lib/usethis).  The link will provide a nice demonstration of features in the package.  In short, the package aims to automate many common tasks performed when writing packages.
+
+To create a new package enter the following in your R console: 
+
+```{r, eval = F}
+  usethis::create_package("~/amazingCode")
+```
+
+Running the line above will cause several things to happen including creating a package.  Below you can see the folder structure that is built following the conventions of R packages.
+
+```{r, eval = F}
+  Changing active project to amazingCode
+  ??? Creating 'R/'
+  ??? Creating 'man/'
+  ??? Writing 'DESCRIPTION'
+  ??? Writing 'NAMESPACE'
+  ??? Writing 'MyPackage.Rproj'
+  ??? Adding '.Rproj.user' to './.gitignore'
+  ??? Adding '^MyPackage\\.Rproj$', '^\\.Rproj\\.user$' to '.Rbuildignore'
+  ??? Opening project in RStudio
+```
+
+Aside from the folder structure being built, a new instance of RStudio will open with the working directory set to the new project related to your package.  Creating packages in this was within RStudio leverages the idea of a R project.  [R projects](https://support.rstudio.com/hc/en-us/articles/200526207-Using-Projects) are useful because they make it easier for us to share code with each other and help in project management.
+
+*Note there are helpers that will allow us to add all sorts of things, just look through usethis if you want to add version control, a readme or whatever.*
+
+## Add code
+
+Ok, in the **_new instance_** of RStudio opened during package creation enter the following in the console
+```{reval = F}
+  usethis::use_r("first_fun")
+```
+
+This line crates a new script and puts it in the correct directory in your package.  We created a script/file called first_fun and in it we would like to store some code.  Let's write a quick function for our package, here I chose to use a simple naming convention where we drop all vowels from the name and use a common prefix among all of our functions.  
+
+*Sidebar: Using a common prefix for all functions in a package makes autocomplete work much better and eases the process of searching for help* 
+
+```{r}
+  frst_fn <- function(x){
+    x * 2
+  }
+```
+
+Now that code has been entered use the hotkey `Ctrl + S` to save the script, **_DO NOT SOURCE or RUN_** the script...that misses the point.  From now on we will change or add code, save it and reload the package to examine the result of our changes.
+
+The way you will work with R is now defined by this workflow:
+1) Add or edit a function in the editor
+2) Ctrl + S to save
+3) Ctrl + L to load the package and all of your code
+
+Once the package is loaded you can type the following in the console
+
+```{r}
+frst_fn(3)
+```
+
+Content that our function works we should proceed to recording the why of our workflow in the documentation.
+
+## Document
+
+This section relies on the roxygen2 package, which builds the skeleton for commenting in the standardized way required by R packages.  You can read more at the [GitHub page](https://github.com/klutometis/roxygen).
+
+Now we are happy with our function and we want to document our code
+`Click on Code -> Insert Roxygen skeleton` *or* 
+`Ctrl + Alt + Shift + R` with your cursor somewhere in the function you wish to document
+
+Fill in the documentation as desired and add sections as necessary.  When you are happy with the text you added
+
+1) Save your work Ctrl + S
+2) Document your code Ctrl + Shift + D
+3) Ctrl + Shift + L to reload the package
+4) See what your help file looks like type in the console ?frst_fun
+5) Repeat the above steps until you are happy
+
+With our code written and documented we should write some tests to make sure that our code works as expected.  We do this step anyway, but here we formalize the process and make it part of the package writing process, we document the testing as well as the code itself.
+
+## Test
+
+This section relies on the [testthat](https://github.com/r-lib/testthat) package, which automates the creation and running of the code tests.  
+
+Testing is next, to setup your package for tests simply run the following:
+
+```{r, eval = F}
+  usethis::use_test()
+```
+
+The code above will set the package up for automated tests to be run.  Automating testing is very important and yet is often ignored when we just want to get something done...I don't have time....you don't have time to write good code that works?
+
+```{r, eval = F}
+  ??? Adding 'testthat' to Suggests field in DESCRIPTION
+  ??? Creating 'tests/testthat/'
+  ??? Writing 'tests/testthat.R'
+  ??? Writing 'tests/testthat/test-first_fun.R'
+  ??? Modify 'tests/testthat/test-first_fun.R'
+```
+
+A script will open once the folder structure is built.  The script has an example of the testthat syntax and a few of the helper functions.  
+
+The following tests will work for the function we created earlier:
+
+```{r, eval = F}
+    test_that("multiplication works", {
+      expect_equal(frst_fun(2), 4)
+      expect_error(frst_fun(NA))
+    })
+```
+
+With our tests written we will execute the following: 
+1) Ctrl + S to save and then
+2) Ctrl + Shift + T to test all of your code
+
+A report of the results will appear in your code editor.  You should see one success and one failure if you copied my code.  I put a bad test in the code just so we see how it looks and as reminder that test results are not always the most obvious.  In this case, the test is poor formed as there is nothing wrong with the function itself.
+
+Before we can report coverage all of our tests need to pass.  Change the test code to
+
+```{R, eval = F}
+    test_that("multiplication works", {
+      expect_equal(frst_fun(2), 4)
+    })
+```
+
+And then press `Ctrl + S`.
+
+Let's take a look at unit coverage to make sure we tested most lines of code, copy and paste the following in the console `covr::report()`.
+
+In the report click on the function name and you will see green highlighting suggesting the line of code is "covered" and "red" for those situations where it is not covered.
+
+Now that our code is written, documented and tested we can build our package.
+
+## Finalize the Build
+
+To build your package `Ctrl + Shift + B`.  You should now be able to find your package alongside the other R packages on your operating system.
+
+On Windows it might look like C:/Users/your.name/Documents/R/win-library/3.4/
+
+Navigate to your package and check out all the files you made, pretty cool, eh?
+
+## Conclusion
+
+This was a very brief overview of writing packages, if you would like more detail on how everything works try the help documentation and vignettes for the individual packages (linked above).  Alternatively, there is a freely available [book](http://r-pkgs.had.co.nz/) to help with package writing.
+
+***
+
+Hope this helps,
+
+Josh
+
+Email: <a href="mailto:josh.nowak@speedgoat.io?Subject=PopR%20again" target="_top">josh.nowak@speedgoat.io</a> 
+GitHub: [Huh](https://github.com/Huh)
+
+<div style="padding-bottom:100px"></div>
