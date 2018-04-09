@@ -107,14 +107,14 @@ x %>%
     ## # A tibble: 10 x 4
     ##       ID   Sex Status  Year
     ##    <chr> <chr>  <dbl> <int>
-    ##  1     a     F      1  2011
-    ##  2     a     F      1  2012
-    ##  3     b     F      1  2011
-    ##  4     b     F      1  2012
+    ##  1     a     M      1  2011
+    ##  2     a     M      1  2012
+    ##  3     b     M      1  2011
+    ##  4     b     M      1  2012
     ##  5     c     F      1  2011
     ##  6     c     F      1  2012
-    ##  7     d     M      1  2011
-    ##  8     d     M      1  2012
+    ##  7     d     F      1  2011
+    ##  8     d     F      1  2012
     ##  9     e     F      1  2011
     ## 10     e     F      1  2012
 
@@ -128,10 +128,11 @@ x %>%
   )
 ```
 
-    ## # A tibble: 1 x 4
+    ## # A tibble: 2 x 4
     ##      ID   Sex Status  Year
     ##   <chr> <chr>  <dbl> <int>
-    ## 1     d     M      1  2014
+    ## 1     a     M      1  2014
+    ## 2     b     M      1  2014
 
 -   Now return the data for Males in 2014
 -   Return the data for Males in 2014, but report only the number of observations of each animal
@@ -194,11 +195,11 @@ xx %>%
     ## # A tibble: 5 x 2
     ##       ID         Mu
     ##   <fctr>      <dbl>
-    ## 1      a  1.1108951
-    ## 2      b -0.3253951
-    ## 3      c  0.1436236
-    ## 4      d  0.6413417
-    ## 5      e -0.2877091
+    ## 1      a -0.8395573
+    ## 2      b  0.2521053
+    ## 3      c -0.2229684
+    ## 4      d  0.1953036
+    ## 5      e -0.3045622
 
 -   What is the mean of Value for each ID in 2011
 -   What is the sum of Value by Year
@@ -206,6 +207,8 @@ xx %>%
 Now, extend these examples to a spatial context.
 
 ### Part 3
+
+I thought this was about spatial data!!! It is, but dplyr is a particularly good example of how you should interact with code. If we are going to be *programming* for GIS then we should be thinking about design, ease of use and the patterns we will use to design our code and workflows. Below we begin by simulating data, using dplyr like operations and ideals.
 
 **Ideals**
 
@@ -255,26 +258,26 @@ ind_dat
     ## # A tibble: 20 x 2
     ##       ID  Npts
     ##    <int> <dbl>
-    ##  1     1    55
-    ##  2     2    99
-    ##  3     3    81
-    ##  4     4    51
-    ##  5     5    89
-    ##  6     6    91
-    ##  7     7    77
-    ##  8     8    93
-    ##  9     9    64
-    ## 10    10    82
-    ## 11    11    54
-    ## 12    12    64
-    ## 13    13    59
-    ## 14    14    69
-    ## 15    15    61
-    ## 16    16    77
-    ## 17    17    81
-    ## 18    18    84
-    ## 19    19    52
-    ## 20    20    88
+    ##  1     1    54
+    ##  2     2    64
+    ##  3     3    67
+    ##  4     4    89
+    ##  5     5    97
+    ##  6     6    87
+    ##  7     7    87
+    ##  8     8    87
+    ##  9     9    98
+    ## 10    10    72
+    ## 11    11    88
+    ## 12    12    87
+    ## 13    13    56
+    ## 14    14    76
+    ## 15    15    58
+    ## 16    16    57
+    ## 17    17    90
+    ## 18    18    66
+    ## 19    19    61
+    ## 20    20    87
 
 Each individual now has an ID and some number of points associated with it. Now we want to apply our function to create xy data to each individual.
 
@@ -299,28 +302,28 @@ ind_dat
     ## Groups: <by row>
     ## 
     ## # A tibble: 20 x 2
-    ##       ID                xy
-    ##  * <int>            <list>
-    ##  1     1 <tibble [53 x 2]>
-    ##  2     2 <tibble [52 x 2]>
-    ##  3     3 <tibble [89 x 2]>
-    ##  4     4 <tibble [94 x 2]>
-    ##  5     5 <tibble [90 x 2]>
-    ##  6     6 <tibble [90 x 2]>
-    ##  7     7 <tibble [60 x 2]>
-    ##  8     8 <tibble [64 x 2]>
-    ##  9     9 <tibble [60 x 2]>
-    ## 10    10 <tibble [81 x 2]>
-    ## 11    11 <tibble [55 x 2]>
-    ## 12    12 <tibble [67 x 2]>
-    ## 13    13 <tibble [77 x 2]>
-    ## 14    14 <tibble [78 x 2]>
-    ## 15    15 <tibble [55 x 2]>
-    ## 16    16 <tibble [74 x 2]>
-    ## 17    17 <tibble [55 x 2]>
-    ## 18    18 <tibble [96 x 2]>
-    ## 19    19 <tibble [60 x 2]>
-    ## 20    20 <tibble [77 x 2]>
+    ##       ID                 xy
+    ##  * <int>             <list>
+    ##  1     1  <tibble [93 x 2]>
+    ##  2     2  <tibble [96 x 2]>
+    ##  3     3  <tibble [96 x 2]>
+    ##  4     4  <tibble [90 x 2]>
+    ##  5     5  <tibble [91 x 2]>
+    ##  6     6 <tibble [100 x 2]>
+    ##  7     7  <tibble [61 x 2]>
+    ##  8     8  <tibble [53 x 2]>
+    ##  9     9  <tibble [65 x 2]>
+    ## 10    10  <tibble [88 x 2]>
+    ## 11    11  <tibble [79 x 2]>
+    ## 12    12  <tibble [54 x 2]>
+    ## 13    13  <tibble [72 x 2]>
+    ## 14    14  <tibble [78 x 2]>
+    ## 15    15  <tibble [51 x 2]>
+    ## 16    16  <tibble [80 x 2]>
+    ## 17    17  <tibble [79 x 2]>
+    ## 18    18  <tibble [76 x 2]>
+    ## 19    19  <tibble [84 x 2]>
+    ## 20    20  <tibble [92 x 2]>
 
 #### Make data long
 
@@ -344,20 +347,20 @@ ind_dat <- tibble::tibble(
 ind_dat
 ```
 
-    ## # A tibble: 1,434 x 3
+    ## # A tibble: 1,484 x 3
     ##       ID         x        y
     ##    <int>     <dbl>    <dbl>
-    ##  1     1 -115.4537 46.30729
-    ##  2     1 -115.5303 45.32653
-    ##  3     1 -113.6948 44.43729
-    ##  4     1 -114.2283 45.06132
-    ##  5     1 -113.5227 42.77924
-    ##  6     1 -115.3828 47.11828
-    ##  7     1 -115.8664 48.59982
-    ##  8     1 -115.9153 47.89935
-    ##  9     1 -115.2163 41.96896
-    ## 10     1 -113.9141 45.14666
-    ## # ... with 1,424 more rows
+    ##  1     1 -117.9024 49.00802
+    ##  2     1 -116.5415 45.12276
+    ##  3     1 -113.8572 46.03616
+    ##  4     1 -114.0114 43.55863
+    ##  5     1 -114.1586 41.27875
+    ##  6     1 -114.7080 43.86735
+    ##  7     1 -110.4709 45.58324
+    ##  8     1 -115.6175 44.82738
+    ##  9     1 -117.1609 46.27330
+    ## 10     1 -114.0286 46.38805
+    ## # ... with 1,474 more rows
 
 Very cool, now we have long data and we have created data in a very simple and flexible fashion. How might we also build this to have a different home range (i.e. activity) center for each individual?
 
@@ -383,20 +386,20 @@ ind_dat <- tibble::tibble(
 ind_dat
 ```
 
-    ## # A tibble: 1,536 x 5
+    ## # A tibble: 1,455 x 5
     ##       ID  x_center y_center         x        y
     ##    <int>     <dbl>    <dbl>     <dbl>    <dbl>
-    ##  1     1 -119.3172 42.18303 -118.3307 39.22451
-    ##  2     1 -119.3172 42.18303 -119.9235 41.08213
-    ##  3     1 -119.3172 42.18303 -118.9663 42.09813
-    ##  4     1 -119.3172 42.18303 -120.1149 36.94780
-    ##  5     1 -119.3172 42.18303 -121.9026 40.41874
-    ##  6     1 -119.3172 42.18303 -119.4429 43.05415
-    ##  7     1 -119.3172 42.18303 -119.8665 40.14204
-    ##  8     1 -119.3172 42.18303 -121.4396 37.79522
-    ##  9     1 -119.3172 42.18303 -118.5256 42.68705
-    ## 10     1 -119.3172 42.18303 -117.7465 41.08479
-    ## # ... with 1,526 more rows
+    ##  1     1 -115.0953 43.30289 -116.0953 45.17671
+    ##  2     1 -115.0953 43.30289 -116.2318 41.69516
+    ##  3     1 -115.0953 43.30289 -118.4702 42.68340
+    ##  4     1 -115.0953 43.30289 -114.6054 46.45707
+    ##  5     1 -115.0953 43.30289 -115.0749 39.93164
+    ##  6     1 -115.0953 43.30289 -114.0481 41.27973
+    ##  7     1 -115.0953 43.30289 -116.1466 44.57237
+    ##  8     1 -115.0953 43.30289 -116.3995 43.65304
+    ##  9     1 -115.0953 43.30289 -113.8198 43.81599
+    ## 10     1 -115.0953 43.30289 -117.0842 41.65583
+    ## # ... with 1,445 more rows
 
 We are using group\_by to sort of temporarily arrange data in chunks by ID. Another way to do this is using the purrr package and the map functions. These will likely be useful to you when stringing together several spatial operations and when working with lists. An example call to purr might look like:
 
@@ -485,26 +488,26 @@ ind_dat %>%
     ## # Groups:   ID [20]
     ##       ID  x_center y_center
     ##    <int>     <dbl>    <dbl>
-    ##  1     1 -119.3172 42.18303
-    ##  2     2 -119.4557 43.59628
-    ##  3     3 -110.3814 46.37563
-    ##  4     4 -113.3871 41.84938
-    ##  5     5 -116.5286 43.31988
-    ##  6     6 -117.2854 44.18714
-    ##  7     7 -117.2555 40.05578
-    ##  8     8 -114.6767 40.34062
-    ##  9     9 -117.7562 47.28334
-    ## 10    10 -117.8589 40.05007
-    ## 11    11 -118.6750 42.35718
-    ## 12    12 -110.8533 45.89758
-    ## 13    13 -110.9442 47.40527
-    ## 14    14 -117.0772 44.31202
-    ## 15    15 -111.1689 42.57834
-    ## 16    16 -117.7949 40.08137
-    ## 17    17 -111.3447 45.04642
-    ## 18    18 -114.9311 41.93377
-    ## 19    19 -119.9993 46.49930
-    ## 20    20 -117.9747 46.01207
+    ##  1     1 -115.0953 43.30289
+    ##  2     2 -119.4799 43.63657
+    ##  3     3 -119.7606 46.18959
+    ##  4     4 -116.3026 42.97501
+    ##  5     5 -113.6979 47.40414
+    ##  6     6 -111.6698 45.98204
+    ##  7     7 -110.3428 40.84698
+    ##  8     8 -118.0021 41.10094
+    ##  9     9 -113.6662 46.83736
+    ## 10    10 -114.6398 44.43339
+    ## 11    11 -116.3914 47.55188
+    ## 12    12 -117.3767 47.48251
+    ## 13    13 -116.5864 46.03444
+    ## 14    14 -116.9369 46.09071
+    ## 15    15 -114.5748 40.57688
+    ## 16    16 -112.7342 41.43013
+    ## 17    17 -111.4364 45.92087
+    ## 18    18 -113.4662 47.13700
+    ## 19    19 -113.1832 42.25604
+    ## 20    20 -116.3541 47.48449
 
 Next we want to make our data spatial, let's build a function to make our data spatial. Again think about solving this problem for one individual, but in a fairly general way.
 
@@ -547,8 +550,8 @@ tst_sp
 ```
 
     ## class       : SpatialPointsDataFrame 
-    ## features    : 72 
-    ## extent      : -124.8361, -114.8183, 36.9478, 47.56596  (xmin, xmax, ymin, ymax)
+    ## features    : 58 
+    ## extent      : -118.9684, -111.1177, 39.93164, 48.56183  (xmin, xmax, ymin, ymax)
     ## coord. ref. : +proj=longlat +datum=WGS84 +ellps=WGS84 +towgs84=0,0,0 
     ## variables   : 1
     ## names       : ID 
@@ -569,8 +572,8 @@ multi_xy
 ```
 
     ## class       : SpatialPointsDataFrame 
-    ## features    : 1536 
-    ## extent      : -125.2793, -105.3048, 34.4298, 53.17558  (xmin, xmax, ymin, ymax)
+    ## features    : 1455 
+    ## extent      : -124.5041, -105.5754, 35.02126, 53.10226  (xmin, xmax, ymin, ymax)
     ## coord. ref. : +proj=longlat +datum=WGS84 +ellps=WGS84 +towgs84=0,0,0 
     ## variables   : 1
     ## names       : ID 

@@ -168,6 +168,8 @@ Now, extend these examples to a spatial context.
 
 ### Part 3
 
+I thought this was about spatial data!!!  It is, but dplyr is a particularly good example of how you should interact with code.  If we are going to be *programming* for GIS then we should be thinking about design, ease of use and the patterns we will use to design our code and workflows.  Below we begin by simulating data, using dplyr like operations and ideals.
+
 **Ideals**
 
 1) Simplify the problem to its smallest/simplest part
