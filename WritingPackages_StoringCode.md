@@ -4,6 +4,9 @@ Josh Nowak
 
 -   [Packages](#packages)
     -   [Prerequisites](#prerequisites)
+    -   [Version Control](#version-control)
+    -   [Tidyverse](#tidyverse)
+    -   [Cheat Sheet](#cheat-sheet)
 -   [Create a package](#create-a-package)
 -   [Add code](#add-code)
 -   [Document](#document)
@@ -30,11 +33,19 @@ Load the required packages, if you do not have one or more of these packages ins
   require(usethis)
 ```
 
+### Version Control
+
 Per usual I am going to give a quick plug for version control. I am a believer and think it is an important part of writing good code, sharing code and making our workflows transparent. I use [git](https://git-scm.com/) and am a big fan, but the learning curve is steep. RStudio and GitHubWhatever you do, just get going with git and you will soon realize the many benefits and start delving deeper. There are some GUIs that help with git including [Sourcetree](https://www.sourcetreeapp.com/) and [GitKraken](https://www.gitkraken.com/) among others. Once you have committed to learning git you should also consider [GitHub](https://github.com/) or [GitLab](https://about.gitlab.com/) for online code storage. The online repositories have really taken off and are one of the best ways to find code and explore what people are working on. The plugins are amazing too and help us write better code. A few favoriates are [Travis](https://github.com/marketplace/travis-ci) and [ZenHub](https://github.com/marketplace/zenhub), but you can find your own favorites by browsing the [marketplace](https://github.com/marketplace) on GitHub.
 
 One of the best resources I have ever used for learning git and GitHub is [happygitwithr](http://happygitwithr.com/). In addition, I am a huge fan of [Jenny Bryan aka jennybc](https://github.com/jennybc). You will benefit from her amazing teaching style and sense of humor.
 
+### Tidyverse
+
 You may also notice that the packages used here play nice with each other, that is no accident. The [tidyverse](https://www.tidyverse.org/) and associated tools are built by a team of folks with a common goal and philosophy.
+
+### Cheat Sheet
+
+The package building cheat sheet form RStudio can be [found here](https://github.com/rstudio/cheatsheets/raw/master/package-development.pdf).
 
 Enough...let's get going.
 
@@ -189,4 +200,6 @@ Hope this helps,
 
 Josh
 
-Email: <a href="mailto:josh.nowak@speedgoat.io?Subject=PopR%20again" target="_top">josh.nowak@speedgoat.io</a> GitHub: [Huh](https://github.com/Huh)
+Email: <a href="mailto:josh.nowak@speedgoat.io?Subject=PopR%20again" target="_top">josh.nowak@speedgoat.io</a>
+
+GitHub: [Huh](https://github.com/Huh)
