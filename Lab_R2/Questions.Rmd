@@ -1,0 +1,74 @@
+---
+title: "Lab R2 Questions"
+author: "Josh Nowak"
+date: "April 9, 2018"
+output: word_document
+---
+
+Please create a html document using rmarkdown and submit for grading.
+
+```{r, echo = F, message = F, warning = F}
+require(adehabitatHR)
+require(sp)
+require(raster)
+require(purrr)
+require(tidyr)
+require(dplyr)
+```
+
+Let us start by creating some data.
+
+```{r}
+x <- tibble::tibble(
+  ID = rep(letters[1:5], each = 5),
+  Sex = rep(sample(c("M", "F"), 5, replace = T), each = 5),
+  Status = 1,
+  Year = rep(2011:2015, 5)
+)
+```
+
+We should discuss what was done above and why it worked.
+
+#### Excercises Part 1 (5 pts each)
+
+* Do an operation that returns all the data from before 2013
+```{r}
+x %>%
+  filter(Year < 2013)
+```
+
+* Now return all the data in 2014
+```{r}
+x %>%
+  filter(
+    Year == 2014,
+    Sex == "M"
+  )
+```
+* Now return the data for Males in 2014
+* Return the data for Males in 2014, but report only the number of observations
+of each animal
+* How many animals of each sex were surveyed in each year
+Option #1
+```{r}
+x %>%
+  group_by(Year) %>%
+  summarise(
+    N_ind = n_distinct(ID)  
+  )
+```
+
+Option #2
+```{r}
+count(x, Year)
+```
+
+* What are the unique values of the ID column and how many observations per (Hint: ?dplyr::n())
+* Sort the result from the previous step in descending order (Hint: ?dplyr::arrange())
+* Change all the values of Status to 2 where Sex is Male using group_by and mutate
+
+## Part 2 (5 points each)
+
+* Why did that last chunk of code work?  Why didn't we have to call group_by?  How would the result have changed if we did call group_by first?
+* Simulate data for 10 animals and add a randomly assigned sex to each individual.  Make the males move more than females when simulating data.
+* Summarize the movements by calculating the mean of each sex to prove that your simulation code had the desired effect.

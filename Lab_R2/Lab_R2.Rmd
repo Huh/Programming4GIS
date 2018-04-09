@@ -1,27 +1,194 @@
 ---
-title: "Spatial Programming R2"
+title: "Spatial Programming Lab"
 author: "Josh Nowak"
 date: "April 2, 2018"
 output: github_document
 ---
 
-```{r}
+```{r, message = F, warning = F}
+require(adehabitatHR)
 require(sp)
 require(raster)
+require(purrr)
 require(tidyr)
 require(dplyr)
 ```
 
 ### Recipe part 2 - Programming and design patterns
 
-In general we want to distill problems to their simplest form.  This may not results in a simple solution, but it will be the simplest.
+In general we want to distill problems to their simplest form.  This may not results in a simple solution, but it will hopefully be the simplest.  In addition, the tools in R and specifically the tidyverse work best when we have long data.  Long data can be defined by each row of your data being a single observation and each column a variable.  See [this link](https://cran.r-project.org/web/packages/tidyr/vignettes/tidy-data.html) for a more complete definition.
 
-Imagine we want to build xy points for a number of individuals and then calculate a home range, i.e. kernel density, on those points.  Let's say we have 20 animals that we want to perform this procedure on.  How do we proceed?
+### Using dplyr
 
-Simplify the problem to one individual...
+[Cheat Sheet is here](https://github.com/rstudio/cheatsheets/raw/master/data-transformation.pdf)
+
+The R package dplyr was written to simplify your life.  If you adopt the 
+conventions of the package your code will likely be quite a bit neater, 
+more efficient, faster and easier to read.  The package is not sliced bread,
+but it generally prevents us from adopting numerous syntaxes and styles within a 
+single script.
+
+A nice introduction (in the form of a vignette) can be found at [this link.](https://cran.rstudio.com/web/packages/dplyr/vignettes/introduction.html)
+
+The packages author, Hadley Wickham, likes to discuss the grammar of data.  The 
+analogy helps us think about how the package is organized.  We use verbs to do 
+things.  
+
+### Main Verbs
+1. filter (and slice)
+    + filters out the desired values or eliminates undesirable data, i.e. 
+    subsetting
+    + slice differs in that it allows one to select rows by position (e.g. 34)
+    + works on rows
+    + base R functions - subset, [
+2. arrange
+    + orders the data according to the values in one or more columns
+    + base R functions - order, sort
+3. select (rename)
+    + allows the user to select certain columns or delete them using a negative
+    sign
+    + works on columns
+    + base R functions - [, $
+4. distinct
+    + finds unique values within a column or tbl_df
+    + works on a column, columns or and entire tbl_df 
+    + base R functions - duplicated, unique
+5. mutate (transmute, mutate_*)
+    + changes the values within a column or adds a new column
+    + transmute is different in that it retains only the modified columns
+    + base R functions - replace, [
+6. summarise (summarise_*)
+    + computes summary statistics over some index or indices, multiple values
+    become one
+    + logical statements usually work within a column, but the effect is on the
+    entire tbl_df
+    + base R functions - tapply, loops
+7. sample_n (sample_frac)
+    + allows subsetting of data randomly by row or fraction of the whole
+    + works on the entire tbl_df by selecting certain rows
+    + base R functions - sample and [ or subset
+8. group_by (rowwise)
+    + groups your data by the values in one or more columns
+    + rowwise differs in that it groups each row as a unique entity
+    + works on columns
+    + base R functions - none, but similar things are accomplished using split
+    followed by lapply or simply a loop over unique values in a column
+9. do
+    + used to perform arbitrary computations (e.g. custom function) that can
+    return a tbl_df or any other R object, but if the result is not a data frame
+    the results will be stored in a list
+    + can work on any portion of the data or the entire tbl_df
+    + base R functions - typically this type of operation would be done using a
+    loop or a member of the apply family
+    
+In addition to the verbs we also have some helpers.
+
+### Helpers
+* n, count, n_distinct, tally
+* groups, group_inidices, group_size
+* lead, lag
+* nth, first, last
+
+
+#### Databases
+dplyr has pretty extensive abilities to connect to databases, but they are 
+beyond the scope of this document.  I just want you to be aware that they exist.
+
+## Example
+
+Let us start by creating some data.
+
+```{r}
+x <- tibble::tibble(
+  ID = rep(letters[1:5], each = 5),
+  Sex = rep(sample(c("M", "F"), 5, replace = T), each = 5),
+  Status = 1,
+  Year = rep(2011:2015, 5)
+)
+```
+
+We should discuss what was done above and why it worked.
+
+#### Excercises Part 1 (5 pts each)
+
+* Do an operation that returns all the data from before 2013
+```{r}
+x %>%
+  filter(Year < 2013)
+```
+* Now return all the data in 2014
+```{r}
+x %>%
+  filter(
+    Year == 2014,
+    Sex == "M"
+  )
+```
+* Now return the data for Males in 2014
+* Return the data for Males in 2014, but report only the number of observations
+of each animal
+* How many animals of each sex were surveyed in each year
+Option #1
+```{r}
+x %>%
+  group_by(Year) %>%
+  summarise(
+    N_ind = n_distinct(ID)  
+  )
+```
+Option #2
+```{r}
+count(x, Year)
+```
+
+
+* What are the unique values of the ID column and how many observations per (Hint: ?dplyr::n())
+* Sort the result from the previous step in descending order (Hint: ?dplyr::arrange())
+* Change all the values of Status to 2 where Sex is Male using group_by and mutate
+
+#### Excercises part 2 (3 pts each)
+```{r}
+xx <- data.frame(ID = rep(letters[1:5], each = 3),
+                 Value = c(rnorm(14), NA),
+                 Year = rep(c(2010:2012), 5))
+```
+
+* What is the mean of Values for each ID
+```{r}
+xx %>%
+  group_by(ID) %>%
+  summarise(
+    Mu = mean(Value, na.rm = T)  
+  )
+```
+* What is the mean of Value for each ID in 2011
+* What is the sum of Value by Year
+
+Now, extend these examples to a spatial context.
+
+### Part 3
+
+**Ideals**
+
+1) Simplify the problem to its smallest/simplest part
+2) Keep data long
+3) Write functions that do one thing
+4) Wrap simple solution in some form of loop
+
+Imagine we want to simulate xy points for a number of individuals.  Let's say we have 20 animals that we want to perform this procedure on, each animal has a different home range center.  How do we proceed?
+
+**_Keep it simple and build up incrementally_**
+
+#### Simulate xy points for one individual
+
+Simplify the problem to one individual and just worry about the first task, simulate xy data for an individual.
+
+
 ```{r}
 build_xy <- function(npts, center_x, noise_x, center_y, noise_y){
-  
+  #  Drawing from 2 independent normals assumes that individuals move in the x
+  #   and y planes independently, seems reasonable
+
   xs <- rnorm(npts, center_x, noise_x)
   ys <- rnorm(npts, center_y, noise_y)
   
@@ -34,16 +201,16 @@ return(out)
 }
 ```
 
-Nice and clean, no extra steps and useful in other projects, likely.
+Nice and clean, no extra steps and useful in other projects, likely.  This function simulates the xy data for a single individual and returns a tibble of x and y coordinates as class numeric.
 
-Ok, so we can make it spatial, but spatial things are a little harder to work with.  How about we hold off on being spatial as long as possible.  Let's create some data...
+You may be wondering why the above is not spatial.  Spatial objects are a little harder to work with and often unnecessary.  How about we hold off on being spatial as long as possible.  Let's create some individuals and try our function.  Below we will create a tibble with individual ID for 20 animals and to make the example more realistic why don't we vary the number of points for each inidividual.
 
 ```{r}
 
 ind_dat <- tibble::tibble(
   ID = 1:20,
-  Npts = round(runif(20, 3, 22))
-  )
+  Npts = round(runif(20, 50, 100))
+)
 
 ind_dat
 ```
@@ -53,45 +220,59 @@ Each individual now has an ID and some number of points associated with it.  Now
 ```{r}
 ind_dat <- tibble::tibble(
   ID = 1:20,
-  Npts = round(runif(20, 3, 22))
+  Npts = round(runif(20, 50, 100))
   ) %>%
   group_by(ID) %>%
-  do(xy = build_xy(.$Npts, center_x = -115, noise_x = 100, center_y = 45, noise_y = 50))
+  do(xy = build_xy(
+    .$Npts, 
+    center_x = -115, 
+    noise_x = 2, 
+    center_y = 45, 
+    noise_y = 2
+  ))
 
 ind_dat
 ```
 
-That was cool, but now we have theis weird listcol *xy* and we would prefer to just have long data.  Try tidyr::unnest...
+#### Make data long
+
+That was cool, but now we have this weird listcol *xy* and we would prefer to just have long data.  Try tidyr::unnest...
 
 ```{r}
 ind_dat <- tibble::tibble(
   ID = 1:20,
-  Npts = round(runif(length(ID), 3, 22))
+  Npts = round(runif(20, 50, 100))
   ) %>%
   group_by(ID) %>%
-  do(xy = build_xy(.$Npts, center_x = -115, noise_x = 100, center_y = 45, noise_y = 50)) %>%
+  do(xy = build_xy(
+    .$Npts, 
+    center_x = -115, 
+    noise_x = 2, 
+    center_y = 45, 
+    noise_y = 2
+  )) %>%
   unnest
 
 ind_dat
 ```
 
-Very cool, now we have long data and we have created data in a very simple and flexible fashion.  How might we also build this to have a different home range center for each individual?
+Very cool, now we have long data and we have created data in a very simple and flexible fashion.  How might we also build this to have a different home range (i.e. activity) center for each individual?
 
 ```{r}
 ind_dat <- tibble::tibble(
   ID = 1:20,
-  Npts = round(runif(length(ID), 3, 22)),
+  Npts = round(runif(length(ID), 50, 100)),
   x_center = runif(length(ID), -120, -110),
-  y_center = runif(length(ID), 40, 48),
+  y_center = runif(length(ID), 40, 48)
   ) %>%
   group_by(ID, x_center, y_center) %>%
   do(xy = 
     build_xy(
       .$Npts, 
       center_x = .$x_center, 
-      noise_x = 100, 
+      noise_x = 2, 
       center_y = .$y_center, 
-      noise_y = 50
+      noise_y = 2
     )
   ) %>%
   unnest
@@ -99,35 +280,27 @@ ind_dat <- tibble::tibble(
 ind_dat
 ```
 
-Check that each individual has a unique home range center
+We are using group_by to sort of temporarily arrange data in chunks by ID.  Another way to do this is using the purrr package and the map functions.  These will likely be useful to you when stringing together several spatial operations and when working with lists.  An example call to purr might look like:
+
+```{r}
+mtcars %>%
+  split(.$cyl) %>% # from base R
+  map(~ lm(mpg ~ wt, data = .)) %>%
+  map(summary)
+
+```
+
+Instead of grouping the above code splits the data into a list by the column "cyl" and then fits a linear regression for each group and finally calls summary on the model fits.  This workflow could work just as well for spatial data.
+
+Check that each individual has a unique home range center by summarizing to the distinct values
+
 ```{r}
 ind_dat %>%
   group_by(ID) %>%
   distinct(x_center, y_center, .keep_all = F)
 ```
 
-Nice!  Ok, now we want to calculate the home range center for each individual.  Let's simplify the problem to a single individual.
-
-```{r}
-    hr_kud <- function(x, ...){
-      #  A function to calculate kernel utilization distributions of single 
-      #   animals or groups of animals
-      #  Takes a spatial points data frame and if desired additional arguments 
-      #   to pass to adehabitatHR::kernelUD
-      #  Returns estUD object
-      #  Intended to be called from within hr_wrapper
-      #  Example Call: 
-      #   hr_kud(xy, grid = 200, same4all = T)
-      #  For more information on options see adehabitatHR documentation
-      #  https://cran.r-project.org/web/packages/adehabitatHR/index.html
-
-      out <- try(adehabitatHR::kernelUD(x, ...))
-
-    return(out)
-    }
-```
-
-Looks like we need a new package adehabitatHR, install the package.  If we type `?adehabitatHR::kernelUD` we see that the first argument to kernelUD must be of class SpatialPoints, so we need a function to change our xy data to a spatial object.
+Next we want to make our data spatial, let's build a function to make our data spatial.  Again think about solving this problem for one individual, but in a fairly general way.
 
 ```{r}
     hr_spdf <- function(x, id, prj){
@@ -138,45 +311,55 @@ Looks like we need a new package adehabitatHR, install the package.  If we type 
       #  Returns a spatial points data frame object
       #  See spatialreference.org for proj4string definitions
       
-      out <- sp::SpatialPointsDataFrame(
-        select(x, 
-          grep("^x|^longitude", colnames(x), ignore.case = T),
-          grep("^y|^latitude", colnames(x), ignore.case = T)),
-        data = as.factor(id),
-        proj4string = CRS(prj)      
-      )
+      out <-  
+        sp::SpatialPointsDataFrame(
+          select(x, 
+            grep("^x$|^long", colnames(x), ignore.case = T),
+            grep("^y$|^lat", colnames(x), ignore.case = T)),
+          data = data.frame(ID = id),
+          proj4string = CRS(prj)      
+        )
 
     return(out)
     }
 
 ```
 
-The workflow then is something like
-- build xy
-- make xy spatial
-- calculate home range kernel
+Let's try our function on one animal
 
-Let's try it for one animal
-```{r}
-tst_dat <- tibble::tibble(
-  ID = 1,
-  Npts = round(runif(length(ID), 3, 22)),
-  x_center = runif(length(ID), -120, -110),
-  y_center = runif(length(ID), 40, 48),
-  ) %>%
-  group_by(ID, x_center, y_center) %>%
-  do(xy = 
-    build_xy(
-      .$Npts, 
-      center_x = .$x_center, 
-      noise_x = 100, 
-      center_y = .$y_center, 
-      noise_y = 50
-    )
-  ) %>%
-  unnest %>%
-  ungroup
+```{r, message = F, warning = F}
 
-#tst_sp <- hr_spdf(tst_dat, id = dplyr::select(tst_dat, ID), prj = '+proj=longlat +datum=WGS84')
-#tst_kud <- hr_kud(tst_sp, grid = 200, same4all = T)
+tst_dat <- ind_dat %>%
+  filter(ID == 1) %>%
+  select(x, y, ID)
+
+tst_sp <- hr_spdf(
+  tst_dat, 
+  id = dplyr::select(tst_dat, ID), 
+  prj = '+proj=longlat +datum=WGS84'
+)
+
+tst_sp
+
 ```
+
+Now if we want to apply our function to multiple animals we can just call our function.
+
+```{r}
+
+multi_xy <- ind_dat %>%
+  select(x, y, ID) %>%
+  hr_spdf(
+    id = .$ID,
+    prj = '+proj=longlat +datum=WGS84'
+  )
+
+multi_xy
+
+```
+
+1) Why did that last chunk of code work?  Why didn't we have to call group_by?  How would the result have changed if we did call group_by first? (5 points)
+2) Simulate data for 10 animals and add a randomly assigned sex to each individual.  Make the males move more than females when simulating data. (5 points)
+3) Summarize the movements by calculating the mean of each sex to prove that your simulation code had the desired effect. (5 points)
+
+*Please create a markdown document in the html format for submission.  *
