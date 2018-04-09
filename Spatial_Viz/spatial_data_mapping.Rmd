@@ -2,7 +2,10 @@
 title: "Plotting Spatial Data in R"
 author: "Joe Smith"
 date: "4/5/2018"
-output: github_document
+html_document:
+  toc: true
+  toc_depth: 3
+  theme: flatly
 ---
 
 ```{r setup, include=FALSE}
@@ -76,11 +79,30 @@ Base R is very flexible and you can make very sophisticated, visually attractive
 
 Base R can also plot raster data. Let's take a look at a common type of raster data that's freely available: climate data. [WorldClim](http://worldclim.org/version2) has some basic data like average monthly precipitation and temperature, as well as a suite of "bioclimatic variables" that can be useful for predicting species distributions, etc. We'll download the bioclimatic variables and look at a few of them.
 
-```{r tidy=T}
+```{r, message = F, warning = F, tidy = T}
 library(raster)
-paths <- list.files("~/Downloads/wc2.0_10m_bio", ".tif", full.names=T)
-raster.list <- lapply(paths, function(x) raster(x))
+
+# create temporary directory
+td <- tempdir()
+
+# create a temporary file
+tf <- tempfile(tmpdir=td, fileext=".zip")
+
+# download the bioclimatic variable from the WorldClim website and put it in the temporary file
+download.file("http://biogeo.ucdavis.edu/data/worldclim/v2.0/tif/base/wc2.0_10m_bio.zip", tf)
+
+# get names of files in .zip file
+fname <- unzip(tf, list=T)$Name
+
+# unzip them, put them in the temporary directory
+unzip(tf, files=fname, exdir=td, overwrite=T)
+
+# read them with raster::raster() and place into list  
+raster.list <- lapply(list.files(td, pattern=".tif",full.names=T), function(x) raster(x))
+
+# compress that list of rasters into a multi-band image ("RasterBrick") with raster::brick()
 bio <- do.call(brick, raster.list)
+
 class(bio)
 ```
 
@@ -252,3 +274,6 @@ mapWorld
 ```
 
 In interactive mode, a leaflet widget is created and shown. If you want to change or extend the widget, you can use the function tmap_leaflet to obtain the leaflet widget object, and use leaflet’s own functions to adjust it.
+
+
+<div style="padding-bottom:100px"></div>
