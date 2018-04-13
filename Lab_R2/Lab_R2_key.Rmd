@@ -139,7 +139,7 @@ of each animal
 x %>% 
   filter(
     Year == 2014,
-    Sex = "M"
+    Sex == "M"
   ) %>%
   group_by(ID) %>%
   summarise(nobs = n())
@@ -422,7 +422,7 @@ multi_xy
 
 1) Why did that last chunk of code work?  Why didn't we have to call group_by?  How would the result have changed if we did call group_by first? (5 points)
 
-- The code works because it is vectorised and so doesn't care if the input is length 1 or greater than 1.  Vectorization is efficient and should be used where possible.  The vectorization is also why we did not need to call group_by, but if we had called group_by we would have returned a single SpatialPointsDataFrame instead of a single SpatialPointsDataFrame containing all individuals. 
+- The code works because it is vectorised and so doesn't care if the input is length 1 or greater than 1.  Vectorization is efficient and should be used where possible.  The vectorization is also why we did not need to call group_by, but if we had called group_by we would have returned a single SpatialPointsDataFrame for each group instead of a single SpatialPointsDataFrame containing all individuals/groups. 
 
 
 2) Simulate data for 10 animals and add a randomly assigned sex to each individual.  Make the males move more than females when simulating data. (5 points)
@@ -438,7 +438,7 @@ sim_dat <- tibble::tibble(
   x_center = runif(length(ID), -120, -110),
   y_center = runif(length(ID), 40, 48)
   ) %>%
-  group_by(ID, x_center, y_center) %>%
+  group_by(ID, Sex) %>%
   do(xy = 
     build_xy(
       .$Npts, 
@@ -455,7 +455,17 @@ sim_dat <- tibble::tibble(
 
 3) Summarize the movements by calculating the mean of each sex to prove that your simulation code had the desired effect. (5 points)
 
+```{r}
+sim_dat %>%
+  group_by(Sex) %>%
+  summarise(
+    mu_x = mean(x),
+    sd_x = sd(x),
+    mu_y = mean(y),
+    sd_y = sd(y)
+  )
 
+```
 
 
 *Please create a markdown document in the html format for submission.  *
