@@ -1,3 +1,7 @@
+# Deprecated
+_This code is archived and not intended for use. It remains archived in case it can serve as a loose reference._
+
+
 # Programming4GIS
 Materials and resources related to Geography 491/489 at The University of Montana
 
